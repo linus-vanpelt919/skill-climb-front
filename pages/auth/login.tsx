@@ -16,9 +16,6 @@ const Login: React.FC = () => {
       await axios.get('http://localhost/sanctum/csrf-cookie', { withCredentials: true });
       const response = await axios.post('http://localhost/api/login',
       { email, password }, {
-        // headers: {
-        //   'X-XSRF-TOKEN': csrfToken,
-        // },
         withCredentials: true,
       });
       // ログイン成功後の処理
