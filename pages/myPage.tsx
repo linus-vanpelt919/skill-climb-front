@@ -1,12 +1,12 @@
 // pages/mypage.tsx
-import React, { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { checkIfUserIsLoggedIn,handleLogout } from './utils/auth';
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
+import { checkIfUserIsLoggedIn, handleLogout } from "./utils/auth";
 import Link from "next/link";
-import axios from 'axios';
+import axios from "axios";
 
 const MyPage: React.FC = () => {
-
+  const router = useRouter();
 
   // useEffect(() => {
   //   const checkLoginStatus = async () => {
@@ -21,13 +21,12 @@ const MyPage: React.FC = () => {
   //   checkLoginStatus();
   // }, []);
 
-   const handleLogout = async () => {
-    const router = useRouter();
+  const handleLogout = async () => {
     try {
-      await axios.post('http://localhost/api/logout', null, {
+      await axios.post("http://localhost/api/logout", null, {
         withCredentials: true,
       });
-      router.push('/auth/login');
+      router.push("/auth/login");
     } catch (error) {
       console.error(error);
     }

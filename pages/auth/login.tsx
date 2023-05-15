@@ -22,6 +22,7 @@ const Login: React.FC = () => {
         withCredentials: true,
       });
       // ログイン成功後の処理
+
       router.push('/myPage');
     } catch (error) {
       console.error(error);

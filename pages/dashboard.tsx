@@ -66,7 +66,13 @@ const Dashboard: React.FC = () => {
       console.error("An error occurred while deleting the task.", error);
     }
   };
+/*
+Todo
+編集機能
+削除機能
+詳細ページ
 
+*/
 
   return (
     <div className="bg-gray-100 min-h-screen">
