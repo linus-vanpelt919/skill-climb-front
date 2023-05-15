@@ -14,11 +14,12 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
+      await axios.get('http://localhost/sanctum/csrf-cookie', { withCredentials: true });
       const response = await axios.post('http://localhost/api/login',
       { email, password }, {
-        headers: {
-          'X-XSRF-TOKEN': csrfToken,
-        },
+        // headers: {
+        //   'X-XSRF-TOKEN': csrfToken,
+        // },
         withCredentials: true,
       });
       // ログイン成功後の処理
@@ -32,11 +33,13 @@ const Login: React.FC = () => {
    // CSRFトークンを取得する関数
    const fetchCsrfToken = async () => {
     try {
-      const response = await axios.get('http://localhost/api/csrf_token');
-      setCsrfToken(response.data);
+      // const response = await axios.get('http://localhost/api/csrf_token');
+      // const response = await axios.get('http://localhost/sanctum/csrf-cookie', { withCredentials: true });
+      // console.log(response);
+      // setCsrfToken(response.data);
 
     } catch (error) {
-      console.error('Error fetching CSRF token:', error);
+      // console.error('Error fetching CSRF token:', error);
     }
   };
 
