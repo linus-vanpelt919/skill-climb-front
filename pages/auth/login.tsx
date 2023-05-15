@@ -8,7 +8,6 @@ const Login: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [csrfToken, setCsrfToken] = useState('');
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
@@ -29,25 +28,6 @@ const Login: React.FC = () => {
       console.error(error);
     }
   };
-
-   // CSRFトークンを取得する関数
-   const fetchCsrfToken = async () => {
-    try {
-      // const response = await axios.get('http://localhost/api/csrf_token');
-      // const response = await axios.get('http://localhost/sanctum/csrf-cookie', { withCredentials: true });
-      // console.log(response);
-      // setCsrfToken(response.data);
-
-    } catch (error) {
-      // console.error('Error fetching CSRF token:', error);
-    }
-  };
-
-  // コンポーネントがマウントされたら、CSRFトークンを取得
-  useEffect(() => {
-    fetchCsrfToken();
-  }, []);
-
 
 
   return (
