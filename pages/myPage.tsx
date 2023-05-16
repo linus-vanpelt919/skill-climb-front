@@ -4,9 +4,38 @@ import React, { useEffect } from "react";
 import { checkIfUserIsLoggedIn, handleLogout } from "./utils/auth";
 import Link from "next/link";
 import axios from "axios";
+// import useSWR, { mutate } from "swr";
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+}
+const API_URL = "http://localhost/api/show";
 
 const MyPage: React.FC = () => {
+  const [userData, setUserData] = React.useState<UserData[]>([]);
+
   const router = useRouter();
+
+  //http://localhost/api/showエンドポイントからaxiosでデータを取得する
+  const fetcher = async (url: string): Promise<UserData[]> => {
+    const response = await axios.get(url);
+    return response.data;
+  };
+
+
+  //  const { data: user, error } = useSWR("/api/show", fetcher);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const userData = await fetcher(API_URL);
+      setUserData(userData);
+      console.log(userData); // 追加
+    };
+    fetchData();
+  }, []);
+
+
 
   // useEffect(() => {
   //   const checkLoginStatus = async () => {
@@ -23,7 +52,8 @@ const MyPage: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost/api/logout", null, {
+      await axios.get('http://localhost/sanctum/csrf-cookie', { withCredentials: true });
+      await axios.post('http://localhost/api/logout', null, {
         withCredentials: true,
       });
       router.push("/auth/login");
