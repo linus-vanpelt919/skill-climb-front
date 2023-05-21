@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from "next/link";
+import { useRecoilState } from "recoil";
+import { isLoggedInState } from "../../states/authState";
 
 const Login: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useRecoilState(isLoggedInState);
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +22,7 @@ const Login: React.FC = () => {
         withCredentials: true,
       });
       // ログイン成功後の処理
-
+      setIsLoggedIn(true);
       router.push('/myPage');
     } catch (error) {
       console.error(error);
