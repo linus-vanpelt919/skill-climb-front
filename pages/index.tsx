@@ -14,7 +14,7 @@ const HomePage = () => {
             <Head>
                 <title>SKILL CLIMB</title>
             </Head>
-						<Header/>
+			<Header/>
 
             <main className="flex flex-col items-center justify-center w-9/12 mt-20">
                 <h1 className="text-6xl text-center text-blue-500 mb-6">

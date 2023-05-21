@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import useSWR, { mutate } from "swr";
 import axios from 'axios';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Task {
   id: number;
@@ -10,7 +12,7 @@ interface Task {
 }
 const API_URL = "http://localhost/api/tasks";
 const fetcher = async (url: string): Promise<Task[]> => {
-  const response = await axios.get(url);
+  const response = await axios.get(url, { withCredentials: true });
   return response.data;
 };
 
@@ -79,6 +81,7 @@ Todo
       <Head>
         <title>Admin Dashboard</title>
       </Head>
+			<Header/>
       <main>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
