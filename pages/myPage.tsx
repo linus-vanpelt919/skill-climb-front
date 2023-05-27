@@ -1,6 +1,7 @@
 // pages/mypage.tsx
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
+import { GetServerSideProps } from "next";
 import { checkIfUserIsLoggedIn, handleLogout } from "./utils/auth";
 import Link from "next/link";
 import axios from "axios";
@@ -15,7 +16,7 @@ interface UserData {
   email: string;
 }
 
-const API_URL = "http://localhost/api/show";
+const API_URL = "http://localhost/api/myPage";
 
 const MyPage: React.FC = () => {
   const [userData, setUserData] = React.useState<UserData | null>(null);
@@ -23,9 +24,21 @@ const MyPage: React.FC = () => {
 
   //http://localhost/api/showエンドポイントからaxiosでデータを取得する
   const fetcher = async (url: string): Promise<UserData> => {
-    const response = await axios.get(url, { withCredentials: true });
-    return response.data;
+    try {
+      const response = await axios.get(url, { withCredentials: true });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+        // 未認証なのでログインページへリダイレクト
+        router.push('/auth/login');
+        throw new Error('User is not authenticated');
+      } else {
+        // それ以外のエラーを投げる
+        throw error;
+      }
+    }
   };
+
 
   //  const { data: user, error } = useSWR("/api/show", fetcher);
 

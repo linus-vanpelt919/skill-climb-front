@@ -26,17 +26,17 @@ const HomePage = () => {
                 </p>
 
                 <div className="flex mt-6 justify-center">
-                    <Link href="/register"
+                    <Link href="/auth/signUp"
                         className="mx-3 px-5 py-3 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-400"
                     >
-                        Get Started
+                        Register
                     </Link>
 
                     <Link
-                        href="#"
+                        href="/auth/login"
                         className="mx-3 px-5 py-3 text-white bg-gray-500 rounded-lg shadow-md hover:bg-gray-400"
                     >
-                        Learn More
+                        login
                     </Link>
                 </div>
             </main>
