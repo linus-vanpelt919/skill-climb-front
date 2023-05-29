@@ -40,7 +40,6 @@ const Dashboard: React.FC = () => {
       console.log("response", response.data);
 
       const newTaskData = response.data;
-      k
       mutate(API_URL, [...tasks, newTaskData], false);
       setTitle("");
       setDescription("");
