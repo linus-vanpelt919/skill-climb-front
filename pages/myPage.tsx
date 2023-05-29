@@ -15,26 +15,51 @@ interface UserData {
 
 const API_URL = "http://skill-climb_laravel.test_1:80/api/show";
 
-
 interface MyPageProps {
   user: UserData | null;
 }
 
 const MyPage: React.FC<MyPageProps> = ({ user }) => {
   const [userData, setUserData] = React.useState<UserData | null>(user);
-  console.log("userData", userData);
+
+  const [email, setEmail] = React.useState(userData?.email || "");
+  const [name, setName] = React.useState(userData?.name || "");
+
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
         <title>SKILL CLIMB</title>
       </Head>
       <Header />
-      {userData && (
-        <div>
-          <p>Name: {userData.email}さん</p>
-        </div>
-      )}
-
+      <div className="flex flex-col w-full p-8 space-y-4 items-center md:w-1/2 lg:w-1/3">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Profile</h2>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          autoComplete="name"
+          className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          autoComplete="email"
+          className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Update
+        </button>
+      </div>
       <Footer />
     </div>
   );
@@ -43,7 +68,6 @@ const MyPage: React.FC<MyPageProps> = ({ user }) => {
 export default MyPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-
   const cookie = context.req.headers.cookie;
   try {
     const response = await axios.get(API_URL, {
@@ -54,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
     return { props: { user: response.data } };
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+   if (axios.isAxiosError(error) && error.response?.status === 401) {
 
       return {
         redirect: {
@@ -64,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     } else {
       // Handle other errors
-      return { props: { user: "test" } };
+      return { props: { user: "" } };
     }
   }
 };

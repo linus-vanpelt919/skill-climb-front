@@ -21,6 +21,9 @@ const Dashboard: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [updatingTask, setUpdatingTask] = useState<Task | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState<string>("");
+  const [editingDescription, setEditingDescription] = useState<string>("");
 
   if (error) return <div>Error: {error.message}</div>;
   if (!tasks) return <div>Loading...</div>;
@@ -37,7 +40,6 @@ const Dashboard: React.FC = () => {
         },
         { withCredentials: true }
       );
-      console.log("response", response.data);
 
       const newTaskData = response.data;
       mutate(API_URL, [...tasks, newTaskData], false);
@@ -49,9 +51,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const updateTask = async (task: Task) => {
+  const updateTask = async (task: Partial<Task> & { id: number }) => {
     try {
-      const response = await axios.put(`${API_URL}/${task.id}`, task, { withCredentials: true });
+      const response = await axios.patch(`${API_URL}/${task.id}`, task, {
+        withCredentials: true,
+      });
       const updatedTaskData = response.data;
       const updatedTasks = tasks.map((t) =>
         t.id === updatedTaskData.id ? updatedTaskData : t
@@ -72,6 +76,33 @@ const Dashboard: React.FC = () => {
       console.error("An error occurred while deleting the task.", error);
     }
   };
+
+  const startEditingTask = (task: Task) => {
+    setEditingTaskId(task.id);
+    setEditingTitle(task.title);
+    setEditingDescription(task.description);
+  };
+
+  const confirmEditingTask = async () => {
+    if (editingTaskId === null) return;
+
+    const taskToUpdate: Partial<Task> = {
+      id: editingTaskId,
+      title: editingTitle,
+      description: editingDescription,
+    };
+
+    if (taskToUpdate && typeof taskToUpdate.id === "number") {
+      await updateTask(taskToUpdate as Task);
+    } else {
+      console.error("taskToUpdate is undefined or does not have a valid id");
+    }
+
+    setEditingTaskId(null);
+    setEditingTitle("");
+    setEditingDescription("");
+  };
+
   /*
 Todo
 編集機能
@@ -121,26 +152,61 @@ Todo
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300　${editingTaskId === task.id ? 'animate-fadeIn' : 'animate-fadeOut'}`"
                   >
-                    <h2 className="text-xl font-semibold mb-4 text-black">
-                      {task.title}
-                    </h2>
-                    <p className="text-black">{task.description}</p>
-                    <div className="flex justify-end">
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
-                        onClick={() => updateTask(task.id)}
-                      >
-                        編集
-                      </button>
-                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded-md"
-                        onClick={() => deleteTask(task.id)}
-                      >
-                        削除{task.id}
-                      </button>
-                    </div>
+                    {editingTaskId === task.id ? (
+                      <div>
+                        <input
+                          type="text"
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          placeholder="Task title"
+                          className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg mb-2"
+                        />
+                        <input
+                          type="text"
+                          value={editingDescription}
+                          onChange={(e) =>
+                            setEditingDescription(e.target.value)
+                          }
+                          placeholder="Task description"
+                          className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg mb-4"
+                        />
+                        <button
+                          onClick={confirmEditingTask}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg mr-2"
+                        >
+                          Update Task
+                        </button>
+                        <button
+                          onClick={() => setEditingTaskId(null)}
+                          className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4 text-black">
+                          {task.title}
+                        </h2>
+                        <p className="text-black">{task.description}</p>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => startEditingTask(task)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteTask(task.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded-md"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
