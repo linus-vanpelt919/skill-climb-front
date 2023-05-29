@@ -9,6 +9,17 @@ const Header = () => {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useRecoilState(isLoggedInState);
 
+  useEffect(() => {
+    axios.get('http://localhost/api/user', {
+      withCredentials: true,
+      })
+    .then(response => {
+      setIsLoggedIn(response.data.isLoggedIn);
+    }).catch(error => {
+      setIsLoggedIn(false);
+    });
+  }, []);
+
   const handleLogout = async () => {
     try {
       await axios.post("http://localhost/api/logout", null, {

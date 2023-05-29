@@ -43,16 +43,8 @@ const MyPage: React.FC<MyPageProps> = ({ user }) => {
 export default MyPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log("contexttest", context.req.headers.cookie);
 
   const cookie = context.req.headers.cookie;
-  // const axiosInstance = axios.create({
-  //   headers: {
-  //     origin: 'localhost:3000',
-  //     cookie: cookie,
-  //   },
-  // });
-
   try {
     const response = await axios.get(API_URL, {
       headers: {
@@ -63,17 +55,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { user: response.data } };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      console.log('error.response',error.response);
 
       return {
-        // redirect: {
-        //   destination: "/auth/login",
-        //   permanent: false,
-        // },
-        props: { user: "error" }
+        redirect: {
+          destination: "/auth/login",
+          permanent: false,
+        },
       };
     } else {
-      console.log("else");
       // Handle other errors
       return { props: { user: "test" } };
     }

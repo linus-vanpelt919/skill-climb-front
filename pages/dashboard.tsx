@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import useSWR, { mutate } from "swr";
-import axios from 'axios';
+import axios from "axios";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -17,10 +17,7 @@ const fetcher = async (url: string): Promise<Task[]> => {
 };
 
 const Dashboard: React.FC = () => {
-  const { data: tasks, error } = useSWR<Task[]>(
-    `${API_URL}`,
-    fetcher
-  );
+  const { data: tasks, error } = useSWR<Task[]>(`${API_URL}`, fetcher);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [updatingTask, setUpdatingTask] = useState<Task | null>(null);
@@ -28,26 +25,34 @@ const Dashboard: React.FC = () => {
   if (error) return <div>Error: {error.message}</div>;
   if (!tasks) return <div>Loading...</div>;
 
-
-  const addTask = async () => {
+  const addTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const previousTasks = tasks; // 保存したタスクのコピーを保持
     try {
-      const response = await axios.post(API_URL, {
-        title,
-        description,
-      });
+      const response = await axios.post(
+        API_URL,
+        {
+          title,
+          description,
+        },
+        { withCredentials: true }
+      );
+      console.log("response", response.data);
 
       const newTaskData = response.data;
+      k
       mutate(API_URL, [...tasks, newTaskData], false);
       setTitle("");
       setDescription("");
     } catch (error) {
       console.error("An error occurred while adding the task.", error);
+      mutate(API_URL, previousTasks, false); // エラーが発生した場合は、元のタスクのリストにロールバック
     }
   };
 
   const updateTask = async (task: Task) => {
     try {
-      const response = await axios.put(`${API_URL}/${task.id}`, task);
+      const response = await axios.put(`${API_URL}/${task.id}`, task, { withCredentials: true });
       const updatedTaskData = response.data;
       const updatedTasks = tasks.map((t) =>
         t.id === updatedTaskData.id ? updatedTaskData : t
@@ -61,19 +66,19 @@ const Dashboard: React.FC = () => {
 
   const deleteTask = async (taskId: number) => {
     try {
-      await axios.delete(`${API_URL}/${taskId}`);
+      await axios.delete(`${API_URL}/${taskId}`, { withCredentials: true });
       const remainingTasks = tasks.filter((task) => task.id !== taskId);
       mutate(API_URL, remainingTasks, false);
     } catch (error) {
       console.error("An error occurred while deleting the task.", error);
     }
   };
-/*
+  /*
 Todo
 編集機能
 削除機能
 詳細ページ
-
+カテゴリー機能
 */
 
   return (
@@ -81,33 +86,35 @@ Todo
       <Head>
         <title>Admin Dashboard</title>
       </Head>
-			<Header/>
+      <Header />
       <main>
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <div className="mb-4">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Task title"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-            <div className="mb-4">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Task description"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-            <button
-              onClick={addTask}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-            >
-              Add Task
-            </button>
+            <form onSubmit={addTask}>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Task title"
+                  className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg"
+                />
+              </div>
+              <div className="mb-4">
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Task description"
+                  className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+              >
+                Add Task
+              </button>
+            </form>
 
             <div className="container mx-auto px-4 py-8">
               <h1 className="text-2xl font-bold mb-6">タスク一覧</h1>
@@ -132,7 +139,7 @@ Todo
                         className="bg-red-500 text-white px-4 py-2 rounded-md"
                         onClick={() => deleteTask(task.id)}
                       >
-                        削除
+                        削除{task.id}
                       </button>
                     </div>
                   </div>
@@ -142,6 +149,7 @@ Todo
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };
