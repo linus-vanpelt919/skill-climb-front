@@ -36,7 +36,7 @@ const Dashboard: React.FC = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("1");
+  const [category, setCategory] = useState(1);
   const [updatingTask, setUpdatingTask] = useState<Task | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState<string>("");
@@ -48,20 +48,19 @@ const Dashboard: React.FC = () => {
 
   const addTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    const previousTasks = tasks; // 保存したタスクのコピーを保持
+    const previousTasks = data; // 保存したタスクのコピーを保持
     try {
       const response = await axios.post(
         API_URL,
         {
           title,
           description,
-          category,
+          category_id: category,
         },
         { withCredentials: true }
       );
-
       const newTaskData = response.data;
-      mutate(API_URL, [...tasks, newTaskData], false);
+      mutate(API_URL, { ...data, tasks: [...tasks, newTaskData] }, false);
       setTitle("");
       setDescription("");
     } catch (error) {
@@ -71,6 +70,7 @@ const Dashboard: React.FC = () => {
   };
 
   const updateTask = async (task: Partial<Task> & { id: number }) => {
+    const previousData = data; // 元のdataのコピーを保持
     try {
       const response = await axios.patch(`${API_URL}/${task.id}`, task, {
         withCredentials: true,
@@ -79,20 +79,23 @@ const Dashboard: React.FC = () => {
       const updatedTasks = tasks.map((t) =>
         t.id === updatedTaskData.id ? updatedTaskData : t
       );
-      mutate(API_URL, updatedTasks, false);
+      mutate(API_URL, { ...data, tasks: updatedTasks }, false);
       setUpdatingTask(null);
     } catch (error) {
       console.error("An error occurred while updating the task.", error);
+      mutate(API_URL, previousData, false);
     }
   };
 
   const deleteTask = async (taskId: number) => {
+    const previousData = data; // 元のdataのコピーを保持
     try {
       await axios.delete(`${API_URL}/${taskId}`, { withCredentials: true });
       const remainingTasks = tasks.filter((task) => task.id !== taskId);
-      mutate(API_URL, remainingTasks, false);
+      mutate(API_URL, { ...data, tasks: remainingTasks }, false);
     } catch (error) {
       console.error("An error occurred while deleting the task.", error);
+      mutate(API_URL, previousData, false); // エラーが発生した場合は、元のdataにロールバック
     }
   };
 
@@ -160,7 +163,7 @@ Todo
               <div className="mb-4">
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => setCategory(parseInt(e.target.value))}
                   placeholder="Task description"
                   className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg"
                 >
