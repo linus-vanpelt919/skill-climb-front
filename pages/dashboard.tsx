@@ -9,23 +9,41 @@ interface Task {
   id: number;
   title: string;
   description: string;
+  name: string;
 }
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface Response {
+  tasks: Task[];
+  categories: Category[];
+}
+
 const API_URL = "http://localhost/api/tasks";
-const fetcher = async (url: string): Promise<Task[]> => {
+const fetcher = async (url: string): Promise<Response> => {
   const response = await axios.get(url, { withCredentials: true });
   return response.data;
 };
 
 const Dashboard: React.FC = () => {
-  const { data: tasks, error } = useSWR<Task[]>(`${API_URL}`, fetcher);
+  const { data, error } = useSWR<Response>(`${API_URL}`, fetcher);
+
+  const tasks = data?.tasks;
+  const categories = data?.categories;
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("1");
   const [updatingTask, setUpdatingTask] = useState<Task | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState<string>("");
   const [editingDescription, setEditingDescription] = useState<string>("");
 
   if (error) return <div>Error: {error.message}</div>;
+
   if (!tasks) return <div>Loading...</div>;
 
   const addTask = async (e: React.FormEvent) => {
@@ -37,6 +55,7 @@ const Dashboard: React.FC = () => {
         {
           title,
           description,
+          category,
         },
         { withCredentials: true }
       );
@@ -138,6 +157,21 @@ Todo
                   className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg"
                 />
               </div>
+              <div className="mb-4">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Task description"
+                  className="w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg"
+                >
+                  {categories?.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
                 type="submit"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg"
@@ -152,7 +186,7 @@ Todo
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300　${editingTaskId === task.id ? 'animate-fadeIn' : 'animate-fadeOut'}`"
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 ${editingTaskId === task.id ? 'animate-fadeIn' : 'animate-fadeOut'}`"
                   >
                     {editingTaskId === task.id ? (
                       <div>

@@ -36,10 +36,10 @@ const Profile: React.FC<MyPageProps> = ({ user }) => {
   const [email, setEmail] = React.useState(userData?.email || "");
   const [username, setUserName] = React.useState(userData?.name || "");
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // ここで username, bio, githubUrl を使用してプロフィールを更新します
-  };
+  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   // ここで username, bio, githubUrl を使用してプロフィールを更新します
+  // };
 
   return (
     <>
@@ -53,7 +53,7 @@ const Profile: React.FC<MyPageProps> = ({ user }) => {
             <h2 className="text-3xl font-semibold text-center mb-6 text-gray-700">
               プロフィール編集
             </h2>
-            <ProfileForm userData={userData} onSubmit={handleSubmit} />
+            <ProfileForm userData={userData} />
           </div>
         </div>
       </div>

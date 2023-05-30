@@ -26,7 +26,7 @@ const MyPage: React.FC<MyPageProps> = ({ user }) => {
   const [name, setName] = React.useState(userData?.name || "");
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="flex flex-col items-center justify-between min-h-screen">
       <Head>
         <title>SKILL CLIMB</title>
       </Head>
